@@ -35,7 +35,7 @@ def main():
     openai_model = OpenaiModel(api_key= api_key, 
                                language= language
                                )
-
+    
     if not os.path.exists(folder_path):
         cli.diplay_system_action("Folder empty")
         return
@@ -63,7 +63,7 @@ def main():
         if media_file_path.lower().endswith(('.m4a')):
             media_file_path= m4a_to_mp3(media_file_path= media_file_path, 
                                             output_folder_path= destination_dir_path) 
-    breakpoint()           
+       
     transcript = get_transcription(openai_model= openai_model,
                                     audio_file_path= media_file_path,
                                     temp_dir= temp_dir,
