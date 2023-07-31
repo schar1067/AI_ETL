@@ -36,12 +36,13 @@ def clean_dir(dir_path: str)-> None:
     # Remove the temporary audio_chunks directory
     os.rmdir(dir_path)
 
-def send_transcript_to_dir(media_file_path:str, destination_dir_path: str, transcript: str)-> None:
-    filename_w_ext= Path(media_file_path).name
-    filename= f"{os.path.splitext(filename_w_ext)[0]}.txt"
+def get_absolute_file_path(file_path:str, destination_dir_path: str, 
+                            type_of_file: str = 'txt')-> str:
+    
+    filename_w_ext= Path(file_path).name
+    filename= f"{os.path.splitext(filename_w_ext)[0]}.{type_of_file}"
     transcript_file_path = os.path.join(destination_dir_path,filename)
-    with open(transcript_file_path, "w", encoding="utf-8") as file:
-        file.write(transcript)
+    return transcript_file_path
 
 def m4a_to_mp3(media_file_path: str,output_folder_path: str)-> str:
 
@@ -53,7 +54,7 @@ def m4a_to_mp3(media_file_path: str,output_folder_path: str)-> str:
 def audio_file_bigger_than_25mb(audio_file_path: str)-> bool:
 
     file_size_bytes = os.path.getsize(audio_file_path)
-    
+
     # Convert bytes to megabytes
     file_size_mb = file_size_bytes / (1024 * 1024)
 

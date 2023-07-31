@@ -27,4 +27,8 @@ class UI(Protocol):
         """Prompt user to select an option and return the option chosen
         """
         raise NotImplementedError()
+    
+    def display_destination_directory(self, destination_dir_path: str)-> None:
+
+        raise NotImplementedError
    
