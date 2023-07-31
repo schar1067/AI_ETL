@@ -2,10 +2,10 @@ import argparse
 import os
 from pathlib import Path
 from cli import CLI
-from openai_models import OpenaiModel
+from openai_models import OpenaiModel, create_summary
 from media_file_converter import (extract_audio, 
                                    list_media_files_in_folder, 
-                                   send_transcript_to_dir, 
+                                   get_absolute_file_path, 
                                    type_of_media_file,
                                    m4a_to_mp3,
                                    get_transcription)
@@ -14,6 +14,7 @@ TEMP_FILE = "temp_audio.mp3"
 TEMP_DIR= "audio_chunks"
 CHUNK_SIZE = 25 * 1024 * 1024  # 25 MB in bytes
 ABS_PATH= Path("/Users/schar/Dropbox/AI_Stuff/Transcripts")
+ABS_PATH_SUMMARIES = Path("/Users/schar/Dropbox/Vault/obsidian_work_vault/Summaries")
 
 def main():
     parser = argparse.ArgumentParser(description="Video/Audio-to-Transcript ETL using OpenAI's Whisper")
@@ -21,11 +22,14 @@ def main():
     parser.add_argument("folder_path", help="Path to the folder containing media files")
     parser.add_argument("--language",default="en",help="language of the media file")
     parser.add_argument("--destination_dir_path",default= ABS_PATH.absolute(),help="Path to allocate the transcripts")
+    parser.add_argument("--destination_dir_path_summ",default= ABS_PATH_SUMMARIES.absolute(),help="Path to allocate the summaries")
+    parser.add_argument("--summarize", action="store_true", help="Enable summarization step")
     args = parser.parse_args()
 
     api_key = args.api_key
     folder_path = args.folder_path
     destination_dir_path = args.destination_dir_path
+    destination_dir_path_summ = args.destination_dir_path_summ
     language=args.language
     temp_file = TEMP_FILE
     temp_dir = TEMP_DIR
@@ -33,8 +37,7 @@ def main():
     cli = CLI()
 
     openai_model = OpenaiModel(api_key= api_key, 
-                               language= language
-                               )
+                               language= language)
     
     if not os.path.exists(folder_path):
         cli.diplay_system_action("Folder empty")
@@ -67,14 +70,25 @@ def main():
     transcript = get_transcription(openai_model= openai_model,
                                     audio_file_path= media_file_path,
                                     temp_dir= temp_dir,
-                                    ui= cli
-                                    )
+                                    ui= cli)
                                     
-    send_transcript_to_dir(media_file_path= media_file_path,
-                           destination_dir_path= destination_dir_path,
-                           transcript= transcript)
+    transcript_file_path = get_absolute_file_path(file_path= media_file_path,
+                      destination_dir_path= destination_dir_path)
+    
+    Path(transcript_file_path).write_text(data= transcript)
 
     cli.display_destination_directory(destination_dir_path= destination_dir_path)
+
+    if args.summarize:
+        cli.diplay_system_action("Summarizing transcript...")
+        summary= create_summary(input_file_path= transcript_file_path)
+        summary_file_path = get_absolute_file_path(file_path= media_file_path,
+                      destination_dir_path= destination_dir_path_summ,
+                      type_of_file= "md")
+        
+        Path(summary_file_path).write_text(data= summary)
+
+        cli.display_destination_directory(destination_dir_path= destination_dir_path_summ)
 
 if __name__ == "__main__":
     main()
