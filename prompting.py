@@ -1,7 +1,7 @@
 from langchain import PromptTemplate
 from prompt_templates import template_system,template_user
 from langchain.chat_models import ChatOpenAI
-from pathlib import Path
+from prompt_pairs import PromptType
 
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -13,7 +13,12 @@ from langchain.schema import (
     SystemMessage
 )
 
-def set_chat_prompt(template_system: str, template_user: str, transcript: str):
+def set_chat_prompt(template_system: str,prompt_pair:dict, prompt_type: PromptType):
+
+    message_pair = prompt_pair[prompt_type] 
+    template_system = message_pair[0]
+    template_user = message_pair[1]
+
     system_message_prompt= SystemMessage(content= template_system)
 
     human_message_prompt = HumanMessagePromptTemplate(

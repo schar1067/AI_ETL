@@ -17,6 +17,10 @@ def list_media_files_in_folder(folder):
     media_files = [file for file in os.listdir(folder) if file.lower().endswith(('.mp4', '.avi', '.mkv', '.wav', '.mp3','.m4a'))]
     return media_files
 
+def list_text_files_in_folder(folder):
+    media_files = [file for file in os.listdir(folder) if file.lower().endswith(('.txt'))]
+    return media_files
+
 
 def type_of_media_file(media_file_path: str)-> str:
     """ Check if it's a video or audio file and return a string with the category
@@ -112,7 +116,7 @@ def get_transcription(openai_model: OpenaiModel, audio_file_path: str,
                 openai_model = openai_model,
                 list_audio_chunks = chunks )
 
-            clean_dir(dir_path= temp_dir)
+            #clean_dir(dir_path= temp_dir)
             return transcript
         else:
             ui.display_terminating_process() 

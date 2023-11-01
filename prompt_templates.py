@@ -21,3 +21,19 @@ template_user = """Write a Title for the transcript that is under 15 words. \
           list item to 100 words, and return no more than 5 points per \
           list. Transcript: ```{transcript}```
           """
+
+template_system_concept_extraction = """You are an assistant that only speaks \
+    in Markdown. Do not write text \
+    that isn't formatted as markdown. Use proper heading and subheadings"""
+
+template_user_concept_extraction = """As a professional summarizer, create a concise and \
+  comprehensive summary of the provided text, be it an article, post, \
+  conversation, or passage, while adhering to these guidelines: \
+  Craft a summary that is detailed, thorough, in-depth, and complex, while \
+  maintaining clarity and conciseness. \
+  Incorporate main ideas and essential information, eliminating extraneous \
+  language and focusing on critical aspects.\
+  Incorporate examples that support the ideas or concepts presented \
+  Rely strictly on the provided text, without including external \
+  information. \
+  Format the summary in paragraph form for easy understanding."""

@@ -5,7 +5,7 @@ from cli import CLI
 from openai_models import OpenaiModel, create_summary
 from media_file_converter import (extract_audio, 
                                    list_media_files_in_folder, 
-                                   get_absolute_file_path, 
+                                   get_absolute_file_path, list_text_files_in_folder, 
                                    type_of_media_file,
                                    m4a_to_mp3,
                                    get_transcription)
@@ -35,10 +35,37 @@ def main():
     temp_dir = TEMP_DIR
 
     cli = CLI()
-
     openai_model = OpenaiModel(api_key= api_key, 
                                language= language)
-    
+
+    if args.summarize:
+
+        if not os.path.exists(destination_dir_path):
+            cli.diplay_system_action("Folder empty")
+            return 
+
+        summary_files = list_text_files_in_folder(destination_dir_path)
+
+        if not summary_files:
+            cli.diplay_system_action("No  files found in the folder.")
+            return
+        
+        choice_path= cli.choose_option(list_choices= summary_files, 
+                                   prompt_message_to_user= "Enter the number of the file you want to summarize: ")
+        transcript_file_path = os.path.join(destination_dir_path, choice_path)
+
+        cli.diplay_system_action("Summarizing transcript...")
+        summary= create_summary(input_file_path= transcript_file_path,model= 'gpt-4')
+        summary_file_path = get_absolute_file_path(file_path= media_file_path,
+                      destination_dir_path= destination_dir_path_summ,
+                      type_of_file= "md")
+        
+        Path(summary_file_path).write_text(data= summary)
+
+        cli.display_destination_directory(destination_dir_path= destination_dir_path_summ)
+        return
+
+
     if not os.path.exists(folder_path):
         cli.diplay_system_action("Folder empty")
         return
@@ -58,14 +85,14 @@ def main():
     if type_of_media_file(media_file_path= media_file_path) == "video":
         extract_audio(video_path= media_file_path, audio_output_path= temp_file)
         cli.diplay_system_action("Transcribing video...")
-        media_file_path= os.path.join(folder_path, temp_file)
+        media_file_path= Path(temp_file).absolute()
 
     else: # Audio file
         cli.diplay_system_action("Transcribing audio...")
 
         if media_file_path.lower().endswith(('.m4a')):
             media_file_path= m4a_to_mp3(media_file_path= media_file_path, 
-                                            output_folder_path= destination_dir_path) 
+                                        output_folder_path= destination_dir_path) 
        
     transcript = get_transcription(openai_model= openai_model,
                                     audio_file_path= media_file_path,
@@ -81,7 +108,7 @@ def main():
 
     if args.summarize:
         cli.diplay_system_action("Summarizing transcript...")
-        summary= create_summary(input_file_path= transcript_file_path)
+        summary= create_summary(input_file_path= transcript_file_path,model= 'gpt-4')
         summary_file_path = get_absolute_file_path(file_path= media_file_path,
                       destination_dir_path= destination_dir_path_summ,
                       type_of_file= "md")

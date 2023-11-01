@@ -46,12 +46,13 @@ def transcribe_single_audio_with_whisper(openai_model: OpenaiModel,audio_file_pa
     return response
 
 def create_summary(input_file_path: str, 
+                   prompt_pair: dict,
                    temperature: float = 0.3,
                    model: str = 'gpt-3.5-turbo')-> str:
     
     chat = ChatOpenAI(temperature= temperature, model= model)
     p = Path(input_file_path)
     transcript = p.read_text()
-    message = set_chat_prompt(template_system,template_user,transcript)
+    message = set_chat_prompt(prompt_pair)
     response = chat(message)
     return response.content
