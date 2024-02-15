@@ -1,6 +1,9 @@
 import argparse
 import os
 from pathlib import Path
+import time
+
+import openai
 from cli import CLI
 from openai_models import OpenaiModel
 from media_file_converter import (extract_audio, 
@@ -63,12 +66,17 @@ def main():
         if media_file_path.lower().endswith(('.m4a')):
             media_file_path= m4a_to_mp3(media_file_path= media_file_path, 
                                             output_folder_path= destination_dir_path) 
-       
-    transcript = get_transcription(openai_model= openai_model,
-                                    audio_file_path= media_file_path,
-                                    temp_dir= temp_dir,
-                                    ui= cli
-                                    )
+    try:   
+        transcript = get_transcription(openai_model= openai_model,
+                                        audio_file_path= media_file_path,
+                                        temp_dir= temp_dir,
+                                        ui= cli
+                                        )
+        
+
+    except openai.error.RateLimitError:
+        print("Rate limit exceeded. Waiting for 60 seconds before retrying.")
+        time.sleep(60)
                                     
     send_transcript_to_dir(media_file_path= media_file_path,
                            destination_dir_path= destination_dir_path,
