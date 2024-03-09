@@ -28,10 +28,12 @@ def type_of_media_file(media_file_path: str)-> str:
     else:
         raise ValueError("File type not supported") 
     
-def clean_dir(dir_path: str)-> None:
-    # Remove temporary chunk files
-    for file in dir_path:
-        os.remove(file)
+
+def clean_dir(dir_path):
+    for file in os.listdir(dir_path):
+        file_path = os.path.join(dir_path, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
     # Remove the temporary audio_chunks directory
     os.rmdir(dir_path)

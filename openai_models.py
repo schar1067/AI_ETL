@@ -36,7 +36,7 @@ def transcribe_multiple_audios_with_whisper(openai_model: OpenaiModel,list_audio
     for chunk_path in tqdm(list_audio_chunks):
        response = openai_model.call_whisper(file_path= chunk_path)
        chunk_responses.append(response)
-       return "\n".join(chunk_responses)
+    return "\n".join(chunk_responses)
 
 def transcribe_single_audio_with_whisper(openai_model: OpenaiModel,audio_file_path: str)-> str:
     response = openai_model.call_whisper(file_path= audio_file_path)
